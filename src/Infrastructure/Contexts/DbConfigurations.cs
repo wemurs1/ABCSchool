@@ -1,7 +1,6 @@
 using Domain.Entities;
 using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
-using Infrastructure.Tenancy;
-using Infrastructure.Tenancy.Models;
+using Infrastructure.Identity.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -23,6 +22,7 @@ internal class DbConfigurations
         public void Configure(EntityTypeBuilder<ApplicationRole> builder)
         {
             builder.ToTable("Roles", "Identity").IsMultiTenant();
+            builder.HasIndex(r=>r.NormalizedName).IsUnique(false);
         }
     }
 
@@ -72,15 +72,6 @@ internal class DbConfigurations
         {
             builder.ToTable("Schools", "Academics").IsMultiTenant();
             builder.Property(school => school.Name).IsRequired().HasMaxLength(60);
-        }
-    }
-
-    internal class ABCSchoolTenantInfoConfig : IEntityTypeConfiguration<ABCSchoolTenantInfo>
-    {
-        public void Configure(EntityTypeBuilder<ABCSchoolTenantInfo> builder)
-        {
-            builder.ToTable("Tenants", "Multitenancy");
-            builder.Property(tenant => tenant.Name).IsRequired().HasMaxLength(60);
         }
     }
 }

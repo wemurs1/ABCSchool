@@ -22,8 +22,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Constants/" />
     <Folder Include="Contexts/" />
-    <Folder Include="Identity/" />
+    <Folder Include="Identity/Auth/" />
+    <Folder Include="Identity/Tokens/" />
   </ItemGroup>
 
 </Project>

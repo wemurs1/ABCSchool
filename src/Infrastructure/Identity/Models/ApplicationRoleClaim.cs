@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Identity;
 
-namespace Infrastructure.Tenancy.Models;
+namespace Infrastructure.Identity.Models;
 
 public class ApplicationRoleClaim : IdentityRoleClaim<string>
 {

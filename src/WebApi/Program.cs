@@ -12,6 +12,9 @@ builder.Services.AddInfrastructureServices(builder.Configuration);
 
 var app = builder.Build();
 
+// Database seeder
+await app.Services.AddDatabaseInitialiserAsync();
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

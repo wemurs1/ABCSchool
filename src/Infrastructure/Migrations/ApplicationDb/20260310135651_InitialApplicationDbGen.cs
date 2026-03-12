@@ -1,5 +1,4 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
@@ -16,9 +15,6 @@ namespace Infrastructure.Migrations.ApplicationDb
 
             migrationBuilder.EnsureSchema(
                 name: "Academics");
-
-            migrationBuilder.EnsureSchema(
-                name: "Multitenancy");
 
             migrationBuilder.CreateTable(
                 name: "Roles",
@@ -51,26 +47,6 @@ namespace Infrastructure.Migrations.ApplicationDb
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Schools", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Tenants",
-                schema: "Multitenancy",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Identifier = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(60)", maxLength: 60, nullable: false),
-                    ConnectionString = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FirstName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ValidUpTo = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tenants", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -236,6 +212,12 @@ namespace Infrastructure.Migrations.ApplicationDb
                 column: "RoleId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Roles_NormalizedName",
+                schema: "Identity",
+                table: "Roles",
+                column: "NormalizedName");
+
+            migrationBuilder.CreateIndex(
                 name: "RoleNameIndex",
                 schema: "Identity",
                 table: "Roles",
@@ -286,10 +268,6 @@ namespace Infrastructure.Migrations.ApplicationDb
             migrationBuilder.DropTable(
                 name: "Schools",
                 schema: "Academics");
-
-            migrationBuilder.DropTable(
-                name: "Tenants",
-                schema: "Multitenancy");
 
             migrationBuilder.DropTable(
                 name: "UserClaims",
