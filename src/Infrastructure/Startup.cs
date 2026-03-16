@@ -27,6 +27,8 @@ using NSwag;
 using NSwag.Generation.Processors.Security;
 using Application.Features.Identity.Tokens;
 using Infrastructure.Identity.Tokens;
+using Application.Mapping;
+using Application.Features.Tenancy;
 
 namespace Infrastructure;
 
@@ -46,10 +48,15 @@ public static class Startup
                 .UseSqlServer(config.GetConnectionString("DefaultConnection")))
             .AddTransient<ITenantDbSeeder, TenantDbSeeder>()
             .AddTransient<ApplicationDbSeeder>()
+            .AddTransient<ITenantService, TenantService>()
             .AddIdentityService()
             .AddPermissions()
             .AddJwtAuthentication(services.AddJwtSettings(config)!)
-            .AddOpenApiDocumentation(config);
+            .AddOpenApiDocumentation(config)
+            .AddAutoMapper(cfg =>
+            {
+                cfg.AddMaps(typeof(MappingProfiles).Assembly);
+            });
     }
 
     public static async Task AddDatabaseInitialiserAsync(this IServiceProvider serviceProvider, CancellationToken cancellationToken = default)

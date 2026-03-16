@@ -13,12 +13,11 @@
   <ItemGroup>
     <Folder Include="Exceptions/" />
     <Folder Include="Features/Identity/Tokens/Queries/" />
-    <Folder Include="Mapping/" />
+    <Folder Include="Features/Tenancy/Commands/" />
     <Folder Include="Wrappers/" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="AutoMapper" Version="16.1.0" />
     <PackageReference Include="FluentValidation" Version="12.1.1" />
     <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
     <PackageReference Include="MediatR" Version="14.1.0" />

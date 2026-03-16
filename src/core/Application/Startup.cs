@@ -1,5 +1,4 @@
 using System.Reflection;
-using Application.Mapping;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -16,10 +15,6 @@ public static class Startup
             .AddMediatR(cfg=>
             {
                 cfg.RegisterServicesFromAssembly(assembly);
-            })
-            .AddAutoMapper(cfg=>
-            {
-                cfg.AddMaps(typeof(MappingProfiles).Assembly);
             });
     }
 }
