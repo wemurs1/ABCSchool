@@ -117,20 +117,26 @@ public static class Startup
             {
                 OnAuthenticationFailed = context =>
                 {
-                    if (context.Exception is SecurityTokenExpiredException)
+                    if (!context.Response.HasStarted)
                     {
-                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                        context.Response.ContentType = "application/type";
-                        var result = JsonSerializer.Serialize(ResponseWrapper.Fail("Token has expired"));
-                        return context.Response.WriteAsync(result);
+                        if (context.Exception is SecurityTokenExpiredException)
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                            context.Response.ContentType = "application/type";
+                            var result = JsonSerializer.Serialize(ResponseWrapper.Fail("Token has expired"));
+                            return context.Response.WriteAsync(result);
+
+                        }
+                        else
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                            context.Response.ContentType = "application/type";
+                            var result = JsonSerializer.Serialize(ResponseWrapper.Fail("An unhandled error has occured"));
+                            return context.Response.WriteAsync(result);
+
+                        }
                     }
-                    else
-                    {
-                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-                        context.Response.ContentType = "application/type";
-                        var result = JsonSerializer.Serialize(ResponseWrapper.Fail("An unhandled error has occured"));
-                        return context.Response.WriteAsync(result);
-                    }
+                    return Task.CompletedTask;
                 },
                 OnChallenge = context =>
                 {

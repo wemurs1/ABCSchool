@@ -1,5 +1,6 @@
 using Application;
 using Infrastructure;
+using WebApi;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseInfrastructureServices();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.MapControllers();
 

@@ -30,7 +30,7 @@ public class TokenService(
     public async Task<TokenResponse> LoginAsync(TokenRequest request)
     {
         #region  Validation
-        if (_tenantContextAccessor.MultiTenantContext.TenantInfo!.IsActive)
+        if (!_tenantContextAccessor.MultiTenantContext.TenantInfo!.IsActive)
         {
             throw new UnauthorizedException(["Tenant subscription is not active. Contact your Administrator"]);
         }
