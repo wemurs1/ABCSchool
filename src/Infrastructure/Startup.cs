@@ -11,6 +11,22 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authorization;
 using Infrastructure.Identity.Auth;
+using Application;
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Security.Claims;
+using System.Net;
+using System.Text.Json;
+using Application.Wrappers;
+using Microsoft.AspNetCore.Http;
+using Infrastructure.Constants;
+using System.Reflection;
+using Infrastructure.OpenApi;
+using NSwag;
+using NSwag.Generation.Processors.Security;
+using Application.Features.Identity.Tokens;
+using Infrastructure.Identity.Tokens;
 
 namespace Infrastructure;
 
@@ -31,7 +47,9 @@ public static class Startup
             .AddTransient<ITenantDbSeeder, TenantDbSeeder>()
             .AddTransient<ApplicationDbSeeder>()
             .AddIdentityService()
-            .AddPermissions();
+            .AddPermissions()
+            .AddJwtAuthentication(services.AddJwtSettings(config)!)
+            .AddOpenApiDocumentation(config);
     }
 
     public static async Task AddDatabaseInitialiserAsync(this IServiceProvider serviceProvider, CancellationToken cancellationToken = default)
@@ -54,7 +72,8 @@ public static class Startup
             })
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddDefaultTokenProviders()
-            .Services;
+            .Services
+            .AddScoped<ITokenService, TokenService>();
     }
 
     internal static IServiceCollection AddPermissions(this IServiceCollection services)
@@ -64,9 +83,156 @@ public static class Startup
             .AddScoped<IAuthorizationHandler, PermissionAuthorizationHandler>();
     }
 
+    public static JwtSettings? AddJwtSettings(this IServiceCollection services, IConfiguration config)
+    {
+        var jwtSettingsConfig = config.GetSection(nameof(JwtSettings));
+        services.Configure<JwtSettings>(jwtSettingsConfig);
+        return jwtSettingsConfig.Get<JwtSettings>();
+    }
+
+    public static IServiceCollection AddJwtAuthentication(this IServiceCollection services, JwtSettings jwtSettings)
+    {
+        var secret = Encoding.ASCII.GetBytes(jwtSettings.Secret);
+        services.AddAuthentication(auth =>
+        {
+            auth.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+            auth.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+
+        })
+        .AddJwtBearer(bearer =>
+        {
+            bearer.RequireHttpsMetadata = false;
+            bearer.SaveToken = true;
+            bearer.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero,
+                RoleClaimType = ClaimTypes.Role,
+                ValidateLifetime = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.Secret))
+            };
+            bearer.Events = new JwtBearerEvents
+            {
+                OnAuthenticationFailed = context =>
+                {
+                    if (context.Exception is SecurityTokenExpiredException)
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        context.Response.ContentType = "application/type";
+                        var result = JsonSerializer.Serialize(ResponseWrapper.Fail("Token has expired"));
+                        return context.Response.WriteAsync(result);
+                    }
+                    else
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                        context.Response.ContentType = "application/type";
+                        var result = JsonSerializer.Serialize(ResponseWrapper.Fail("An unhandled error has occured"));
+                        return context.Response.WriteAsync(result);
+                    }
+                },
+                OnChallenge = context =>
+                {
+                    context.HandleResponse();
+                    if (!context.Response.HasStarted)
+                    {
+                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
+                        context.Response.ContentType = "application/type";
+                        var result = JsonSerializer.Serialize(ResponseWrapper.Fail("You are not authorised"));
+                        return context.Response.WriteAsync(result);
+                    }
+                    return Task.CompletedTask;
+                },
+                OnForbidden = context =>
+                {
+                    context.Response.StatusCode = (int)HttpStatusCode.Forbidden;
+                    context.Response.ContentType = "application/type";
+                    var result = JsonSerializer.Serialize(ResponseWrapper.Fail("You are not authorised to access this resource"));
+                    return context.Response.WriteAsync(result);
+                }
+            };
+        });
+
+        services.AddAuthorization(options =>
+        {
+            foreach (var property in typeof(SchoolPermissions).GetNestedTypes()
+             .SelectMany(type => type.GetFields(BindingFlags.Public | BindingFlags.Static | BindingFlags.FlattenHierarchy)))
+            {
+                var propertyValue = property.GetValue(null);
+                if (propertyValue is not null)
+                {
+                    options.AddPolicy(propertyValue.ToString()!, policy =>
+                    {
+                        policy.RequireClaim(ClaimConstants.Permission, propertyValue.ToString()!);
+                    });
+                }
+            }
+        });
+
+        return services;
+    }
+
+    internal static IServiceCollection AddOpenApiDocumentation(this IServiceCollection services, IConfiguration config)
+    {
+        var swaggerSettings = config.GetSection(nameof(SwaggerSettings)).Get<SwaggerSettings>();
+        services
+            .AddEndpointsApiExplorer();
+
+        _ = services.AddOpenApiDocument((document, serviceProvider) =>
+        {
+            document.PostProcess = doc =>
+            {
+                doc.Info.Title = swaggerSettings?.Title;
+                doc.Info.Description = swaggerSettings?.Description;
+                doc.Info.Contact = new OpenApiContact
+                {
+                    Name = swaggerSettings?.ContactName,
+                    Email = swaggerSettings?.ContactEmail,
+                    Url = swaggerSettings?.ContactUrl
+                };
+                doc.Info.License = new OpenApiLicense
+                {
+                    Name = swaggerSettings?.LicenseName,
+                    Url = swaggerSettings?.LicenseUrl
+                };
+            };
+            document.AddSecurity(JwtBearerDefaults.AuthenticationScheme, new OpenApiSecurityScheme
+            {
+                Name = "Authorization",
+                Description = "Enter your Bearer token to attach it as a header on your requests",
+                In = OpenApiSecurityApiKeyLocation.Header,
+                Type = OpenApiSecuritySchemeType.Http,
+                Scheme = JwtBearerDefaults.AuthenticationScheme,
+                BearerFormat = "JWT"
+            });
+            document.OperationProcessors.Add(new AspNetCoreOperationSecurityScopeProcessor());
+            document.OperationProcessors.Add(new SwaggerGlobalAuthProcessor());
+            document.OperationProcessors.Add(new SwaggerHeaderAttributeProcessor());
+        });
+
+        return services;
+    }
+
     public static IApplicationBuilder UseInfrastructureServices(this IApplicationBuilder app)
     {
         return app
-            .UseMultiTenant();
+            .UseAuthentication()
+            .UseMultiTenant()
+            .UseAuthorization()
+            .UseOpenApiDocumentation();
+    }
+
+    internal static IApplicationBuilder UseOpenApiDocumentation(this IApplicationBuilder app)
+    {
+        app.UseOpenApi();
+        app.UseSwaggerUi(options =>
+        {
+            options.DefaultModelExpandDepth = -1;
+            options.DocExpansion = "none";
+            options.TagsSorter = "alpha";
+        });
+
+        return app;
     }
 }
