@@ -1,4 +1,5 @@
 using Application;
+using Application.Features.Identity.Roles;
 using Application.Features.Identity.Tokens;
 using Application.Features.Schools;
 using Application.Features.Tenancy;
@@ -9,6 +10,7 @@ using Finbuckle.MultiTenant.EntityFrameworkCore.Extensions;
 using Finbuckle.MultiTenant.Extensions;
 using Infrastructure.Constants;
 using Infrastructure.Contexts;
+using Infrastructure.Identity;
 using Infrastructure.Identity.Auth;
 using Infrastructure.Identity.Models;
 using Infrastructure.Identity.Tokens;
@@ -52,6 +54,7 @@ public static class Startup
             .AddTransient<ApplicationDbSeeder>()
             .AddTransient<ITenantService, TenantService>()
             .AddTransient<ISchoolService, SchoolService>()
+            .AddTransient<IRoleService, RoleService>()
             .AddIdentityService()
             .AddPermissions()
             .AddJwtAuthentication(services.AddJwtSettings(config)!)

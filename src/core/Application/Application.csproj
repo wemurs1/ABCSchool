@@ -12,12 +12,16 @@
 
   <ItemGroup>
     <Folder Include="Exceptions/" />
+    <Folder Include="Features/Identity/Roles/" />
+    <Folder Include="Features/Identity/Roles/Commands/" />
+    <Folder Include="Features/Identity/Roles/Queries/" />
     <Folder Include="Features/Identity/Tokens/Queries/" />
     <Folder Include="Features/Schools/" />
     <Folder Include="Features/Schools/Commands/" />
     <Folder Include="Features/Schools/Queries/" />
     <Folder Include="Features/Schools/Validations/" />
     <Folder Include="Features/Tenancy/Commands/" />
+    <Folder Include="Pipelines/" />
     <Folder Include="Wrappers/" />
   </ItemGroup>
 

@@ -1,10 +1,10 @@
+using Application.Pipelines;
 using Application.Wrappers;
-using AutoMapper;
 using MediatR;
 
 namespace Application.Features.Schools.Commands;
 
-public class UpdateSchoolCommand : IRequest<IResponseWrapper>
+public class UpdateSchoolCommand : IRequest<IResponseWrapper>, IValidateMe
 {
     public required UpdateSchoolRequest UpdateSchool { get; set; }
 }

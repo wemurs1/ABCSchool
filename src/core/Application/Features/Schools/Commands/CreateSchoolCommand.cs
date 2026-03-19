@@ -1,3 +1,4 @@
+using Application.Pipelines;
 using Application.Wrappers;
 using AutoMapper;
 using Domain.Entities;
@@ -5,7 +6,7 @@ using MediatR;
 
 namespace Application.Features.Schools.Commands;
 
-public class CreateSchoolCommand : IRequest<IResponseWrapper>
+public class CreateSchoolCommand : IRequest<IResponseWrapper>, IValidateMe
 {
     public required CreateSchoolRequest CreateSchool { get; set; }
 }
