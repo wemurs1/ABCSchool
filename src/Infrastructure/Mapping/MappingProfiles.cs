@@ -1,4 +1,5 @@
 using Application.Features.Identity.Roles;
+using Application.Features.Identity.Users;
 using Application.Features.Schools;
 using Application.Features.Tenancy;
 using AutoMapper;
@@ -16,5 +17,6 @@ public class MappingProfiles : Profile
         CreateMap<School, SchoolResponse>();
         CreateMap<CreateSchoolRequest, School>();
         CreateMap<ApplicationRole, RoleResponse>();
+        CreateMap<ApplicationUser, UserResponse>();
     }
 }

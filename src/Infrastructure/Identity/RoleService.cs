@@ -35,7 +35,7 @@ public class RoleService(
         var result = await _roleManager.CreateAsync(newRole);
         if (!result.Succeeded)
         {
-            throw new IdentityException(GetIdentityResultErrorDescriptions(result));
+            throw new IdentityException(IdentityHelper.GetIdentityResultErrorDescriptions(result));
         }
         return newRole.Name;
     }
@@ -57,7 +57,7 @@ public class RoleService(
         var result = await _roleManager.DeleteAsync(roleInDB);
         if (!result.Succeeded)
         {
-            throw new IdentityException(GetIdentityResultErrorDescriptions(result));
+            throw new IdentityException(IdentityHelper.GetIdentityResultErrorDescriptions(result));
         }
 
         return roleInDB.Name;
@@ -106,7 +106,7 @@ public class RoleService(
         var result = await _roleManager.UpdateAsync(roleInDb);
         if (!result.Succeeded)
         {
-            throw new IdentityException(GetIdentityResultErrorDescriptions(result));
+            throw new IdentityException(IdentityHelper.GetIdentityResultErrorDescriptions(result));
         }
 
         return roleInDb.Name;
@@ -131,7 +131,7 @@ public class RoleService(
             var result = await _roleManager.RemoveClaimAsync(roleInDb, claim);
             if (!result.Succeeded)
             {
-                throw new IdentityException(GetIdentityResultErrorDescriptions(result));
+                throw new IdentityException(IdentityHelper.GetIdentityResultErrorDescriptions(result));
             }
         }
 
@@ -150,17 +150,5 @@ public class RoleService(
         if (!dbResult) return "No permissions updated";
 
         return "Permissions updated successufully";
-    }
-
-    private List<string> GetIdentityResultErrorDescriptions(IdentityResult identityResult)
-    {
-        var errorDescriptions = new List<string>();
-
-        foreach (var error in identityResult.Errors)
-        {
-            errorDescriptions.Add(error.Description);
-        }
-
-        return errorDescriptions;
     }
 }
