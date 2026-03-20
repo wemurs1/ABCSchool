@@ -1,4 +1,5 @@
 using System.Net;
+using System.Net.Mime;
 using System.Text.Json;
 using Application.Exceptions;
 using Application.Wrappers;
@@ -18,7 +19,7 @@ public class ErrorHandlingMiddleware(RequestDelegate next)
         catch (Exception ex)
         {
             var response = context.Response;
-            response.ContentType = "application/json";
+            response.ContentType = MediaTypeNames.Application.Json;
 
             var responseWrapper = ResponseWrapper.Fail();
 
