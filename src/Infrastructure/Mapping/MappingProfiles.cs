@@ -1,7 +1,7 @@
-using Application.Features.Identity.Roles;
-using Application.Features.Identity.Users;
-using Application.Features.Schools;
-using Application.Features.Tenancy;
+using ABCShared.Library.Models.Requests.Schools;
+using ABCShared.Library.Models.Responses.Identity;
+using ABCShared.Library.Models.Responses.Schools;
+using ABCShared.Library.Models.Responses.Tenancy;
 using AutoMapper;
 using Domain.Entities;
 using Infrastructure.Identity.Models;

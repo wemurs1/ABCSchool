@@ -1,3 +1,4 @@
+using ABCShared.Library.Models.Requests.Schools;
 using FluentValidation;
 
 namespace Application.Features.Schools.Validations;

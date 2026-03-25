@@ -1,3 +1,6 @@
+using ABCShared.Library.Models.Requests.Identity;
+using ABCShared.Library.Models.Responses.Identity;
+
 namespace Application.Features.Identity.Users;
 
 public interface IUserService

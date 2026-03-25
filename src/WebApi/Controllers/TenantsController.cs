@@ -1,7 +1,7 @@
-using Application.Features.Tenancy;
+using ABCShared.Library.Constants;
+using ABCShared.Library.Models.Requests.Tenancy;
 using Application.Features.Tenancy.Commands;
 using Application.Features.Tenancy.Queries;
-using Infrastructure.Constants;
 using Infrastructure.Identity.Auth;
 using Microsoft.AspNetCore.Mvc;
 

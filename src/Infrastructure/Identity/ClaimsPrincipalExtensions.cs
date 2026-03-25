@@ -1,5 +1,5 @@
 using System.Security.Claims;
-using Infrastructure.Constants;
+using ABCShared.Library.Constants;
 
 namespace Infrastructure.Identity;
 

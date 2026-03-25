@@ -1,7 +1,7 @@
-using Application.Features.Schools;
+using ABCShared.Library.Constants;
+using ABCShared.Library.Models.Requests.Schools;
 using Application.Features.Schools.Commands;
 using Application.Features.Schools.Queries;
-using Infrastructure.Constants;
 using Infrastructure.Identity.Auth;
 using Microsoft.AspNetCore.Mvc;
 

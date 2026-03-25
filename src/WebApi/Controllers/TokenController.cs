@@ -1,6 +1,6 @@
-using Application.Features.Identity.Tokens;
+using ABCShared.Library.Constants;
+using ABCShared.Library.Models.Requests.Token;
 using Application.Features.Identity.Tokens.Queries;
-using Infrastructure.Constants;
 using Infrastructure.Identity.Auth;
 using Infrastructure.OpenApi;
 using Microsoft.AspNetCore.Authorization;

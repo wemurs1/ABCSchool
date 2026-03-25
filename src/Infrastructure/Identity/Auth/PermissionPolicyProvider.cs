@@ -1,4 +1,4 @@
-using Infrastructure.Constants;
+using ABCShared.Library.Constants;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.Options;
 

@@ -1,3 +1,5 @@
+using ABCShared.Library.Models.Requests.Tenancy;
+using ABCShared.Library.Models.Responses.Tenancy;
 using Application.Exceptions;
 using Application.Features.Tenancy;
 using AutoMapper;
