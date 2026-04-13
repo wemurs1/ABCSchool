@@ -10,6 +10,14 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ABC School App", policy =>
+    {
+        policy.WithOrigins("https://localhost:5001").AllowAnyMethod().AllowAnyHeader();
+    });
+});
+
 builder.Services.AddInfrastructureServices(builder.Configuration);
 builder.Services.AddApplicationServices();
 
@@ -25,6 +33,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("ABC School App");
 
 app.UseInfrastructureServices();
 
