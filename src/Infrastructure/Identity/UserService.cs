@@ -99,6 +99,8 @@ public class UserService(
         };
         var result = await _userManager.CreateAsync(newUser, request.Password);
         if (!result.Succeeded) throw new IdentityException(IdentityHelper.GetIdentityResultErrorDescriptions(result));
+        var roleResult = await _userManager.AddToRoleAsync(newUser, RoleConstants.Basic);
+        if (!roleResult.Succeeded) throw new IdentityException(IdentityHelper.GetIdentityResultErrorDescriptions(roleResult));
         return newUser.Id;
     }
 
